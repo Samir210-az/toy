@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import { subscribeAnbarHereketleri, addAnbarHereket, deleteAnbarHereket } from '../utils/db';
+import { subscribeAnbarHereketleri, addAnbarHereket, deleteAnbarHereket, subscribeMeclisler, subscribeZallar } from '../utils/db';
 import Footer from '../components/Footer';
 
 const PRESET_MEHSULLAR = [
@@ -36,13 +36,14 @@ function todayStr() {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
 
-function HereketForm({ tip, mehsullar, onClose, customerId }) {
+function HereketForm({ tip, mehsullar, meclisler, zallar, onClose, customerId }) {
   const [mehsul, setMehsul] = useState('');
   const [customMehsul, setCustomMehsul] = useState('');
   const [customVahid, setCustomVahid] = useState('kq');
   const [miqdar, setMiqdar] = useState('');
   const [qiymetVahid, setQiymetVahid] = useState('');
   const [tarix, setTarix] = useState(todayStr());
+  const [meclisId, setMeclisId] = useState('');
   const [qeyd, setQeyd] = useState('');
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
@@ -51,6 +52,13 @@ function HereketForm({ tip, mehsullar, onClose, customerId }) {
   const secilmisMehsul = isCustom ? customMehsul.trim() : mehsul;
   const secilmisVahid = isCustom ? customVahid : (mehsullar.find((m) => m.ad === mehsul)?.vahid || 'kq');
   const cemi = tip === 'giris' ? (Number(miqdar) || 0) * (Number(qiymetVahid) || 0) : null;
+
+  const gelecekMeclisler = useMemo(
+    () => [...meclisler].sort((a, b) => b.tarix.localeCompare(a.tarix)),
+    [meclisler]
+  );
+  const secilmisMeclis = gelecekMeclisler.find((m) => m.id === meclisId);
+  const zalAdi = (zalId) => zallar.find((z) => z.id === zalId)?.ad || '';
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -73,7 +81,9 @@ function HereketForm({ tip, mehsullar, onClose, customerId }) {
         qiymetVahid: tip === 'giris' ? Number(qiymetVahid) || 0 : null,
         cemi: tip === 'giris' ? cemi : null,
         tarix,
-        qeyd: qeyd.trim() || null,
+        meclisId: tip === 'cixis' && secilmisMeclis ? secilmisMeclis.id : null,
+        meclisAd: tip === 'cixis' && secilmisMeclis ? secilmisMeclis.adFamiliya : null,
+        qeyd: tip === 'cixis' && !secilmisMeclis ? qeyd.trim() || null : null,
       });
       onClose();
     } catch (err) {
@@ -172,13 +182,32 @@ function HereketForm({ tip, mehsullar, onClose, customerId }) {
 
           {tip === 'cixis' && (
             <div>
-              <label className="block text-sm text-gray-300 mb-1">Qeyd (istəyə görə)</label>
-              <input
-                value={qeyd}
-                onChange={(e) => setQeyd(e.target.value)}
-                placeholder="Məs: Əli bəyin toyu üçün"
+              <label className="block text-sm text-gray-300 mb-1">Hansı toy üçün?</label>
+              <select
+                value={meclisId}
+                onChange={(e) => setMeclisId(e.target.value)}
                 className="w-full rounded-lg bg-white/5 border border-white/10 px-3 py-2 text-white outline-none focus:border-indigo-400"
-              />
+              >
+                <option value="">Toya aid deyil / ümumi istifadə</option>
+                {gelecekMeclisler.map((m) => (
+                  <option key={m.id} value={m.id}>
+                    {m.adFamiliya} — {m.tarix} ({zalAdi(m.zalId)})
+                  </option>
+                ))}
+              </select>
+              {secilmisMeclis && (
+                <p className="text-xs text-emerald-400 mt-1">
+                  Bu toyun gəliri: {Number(secilmisMeclis.cemi || 0).toLocaleString('az-AZ')} ₼
+                </p>
+              )}
+              {!secilmisMeclis && (
+                <input
+                  value={qeyd}
+                  onChange={(e) => setQeyd(e.target.value)}
+                  placeholder="Qeyd (istəyə görə)"
+                  className="w-full mt-2 rounded-lg bg-white/5 border border-white/10 px-3 py-2 text-white outline-none focus:border-indigo-400"
+                />
+              )}
             </div>
           )}
 
@@ -202,11 +231,20 @@ function HereketForm({ tip, mehsullar, onClose, customerId }) {
 export default function Anbar() {
   const { customerId } = useAuth();
   const [hereketler, setHereketler] = useState([]);
+  const [meclisler, setMeclisler] = useState([]);
+  const [zallar, setZallar] = useState([]);
   const [formTip, setFormTip] = useState(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState(null);
 
   useEffect(() => {
-    return subscribeAnbarHereketleri(customerId, setHereketler);
+    const unsub1 = subscribeAnbarHereketleri(customerId, setHereketler);
+    const unsub2 = subscribeMeclisler(customerId, setMeclisler);
+    const unsub3 = subscribeZallar(customerId, setZallar);
+    return () => {
+      unsub1();
+      unsub2();
+      unsub3();
+    };
   }, [customerId]);
 
   const mehsulList = useMemo(() => {
@@ -300,6 +338,7 @@ export default function Anbar() {
                     <p className="text-xs text-gray-500 truncate">
                       {h.tarix} · {h.miqdar} {h.vahid || 'kq'}
                       {h.tip === 'giris' && h.qiymetVahid ? ` · ${h.qiymetVahid} ₼/${h.vahid || 'kq'}` : ''}
+                      {h.tip === 'cixis' && h.meclisAd ? ` · 🎊 ${h.meclisAd}` : ''}
                       {h.qeyd ? ` · ${h.qeyd}` : ''}
                     </p>
                   </div>
@@ -341,7 +380,14 @@ export default function Anbar() {
       <Footer />
 
       {formTip && (
-        <HereketForm tip={formTip} mehsullar={mehsulList} onClose={() => setFormTip(null)} customerId={customerId} />
+        <HereketForm
+          tip={formTip}
+          mehsullar={mehsulList}
+          meclisler={meclisler}
+          zallar={zallar}
+          onClose={() => setFormTip(null)}
+          customerId={customerId}
+        />
       )}
     </div>
   );
