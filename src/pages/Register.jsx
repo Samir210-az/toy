@@ -16,10 +16,11 @@ export default function Register() {
   }
 
   function setZalSayi(sayi) {
+    const clamped = Math.min(2, Math.max(1, sayi));
     setZalAdlari((prev) => {
       const next = [...prev];
-      while (next.length < sayi) next.push('');
-      while (next.length > sayi) next.pop();
+      while (next.length < clamped) next.push('');
+      while (next.length > clamped) next.pop();
       return next;
     });
   }
@@ -102,13 +103,14 @@ export default function Register() {
           </div>
 
           <div>
-            <label className="block text-sm text-gray-300 mb-1">Neçə zalınız var?</label>
+            <label className="block text-sm text-gray-300 mb-1">Neçə zalınız var? (maksimum 2)</label>
             <input
               required
               type="number"
               min={1}
+              max={2}
               value={zalAdlari.length}
-              onChange={(e) => setZalSayi(Math.max(1, Number(e.target.value) || 1))}
+              onChange={(e) => setZalSayi(Number(e.target.value) || 1)}
               className="w-full rounded-lg bg-white/5 border border-white/10 px-4 py-2.5 text-white outline-none focus:border-indigo-400 transition-colors"
             />
           </div>
