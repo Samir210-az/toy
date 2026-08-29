@@ -43,7 +43,17 @@ export default function Login() {
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-10 bg-gradient-to-b from-[#0f1115] to-[#161a22]">
-      <div className="w-full max-w-md rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl p-8 shadow-2xl">
+      <div className="w-full max-w-md rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl overflow-hidden shadow-2xl">
+        <div className="relative h-48 bg-gradient-to-b from-white/5 to-transparent flex items-end justify-center overflow-hidden">
+          <img
+            src="/images/login-couple.jpg"
+            alt=""
+            className="h-full w-auto object-contain object-bottom drop-shadow-2xl"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#161a22] via-transparent to-transparent" />
+        </div>
+
+        <div className="p-8 pt-6">
         <h1 onClick={handleTitleTap} className="text-2xl font-semibold text-white mb-6 select-none">
           Daxil olun
         </h1>
@@ -90,6 +100,7 @@ export default function Login() {
             Qeydiyyatdan keçin
           </Link>
         </p>
+        </div>
       </div>
     </div>
   );

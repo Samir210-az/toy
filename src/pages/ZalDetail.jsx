@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { subscribeZallar, subscribeMeclisler } from '../utils/db';
 import { getZalColor } from '../utils/colors';
+import { getHallImage } from '../utils/hallImages';
 import Calendar from '../components/Calendar';
 import MeclisDetailModal from '../components/MeclisDetailModal';
 import Footer from '../components/Footer';
@@ -56,7 +57,12 @@ export default function ZalDetail() {
         </div>
       </header>
 
-      <main className="max-w-6xl mx-auto px-4 py-6 space-y-6">
+      <div className="relative h-32 sm:h-40 overflow-hidden">
+        <img src={getHallImage(zalId, zallar)} alt="" className="w-full h-full object-cover" />
+        <div className={`absolute inset-0 bg-gradient-to-t ${color.gradient} via-black/50 to-[#0f1115]`} />
+      </div>
+
+      <main className="max-w-6xl mx-auto px-4 py-6 space-y-6 -mt-8 relative">
         <Calendar zallar={zallar.filter((z) => z.id === zalId)} meclisler={zalMeclisler} />
 
         <div className="rounded-2xl border border-white/10 bg-white/5 p-4 sm:p-5">
