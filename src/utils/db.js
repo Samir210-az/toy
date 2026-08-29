@@ -18,7 +18,7 @@ export function normalizePhone(phone) {
 
 // ---------- Müştəri qeydiyyat / giriş ----------
 
-export async function registerCustomer({ restoranAdi, phone, pin, zalSayi }) {
+export async function registerCustomer({ restoranAdi, phone, pin, zalAdlari }) {
   const customerId = normalizePhone(phone);
   const existing = await get(ref(db, `customers/${customerId}`));
   if (existing.exists()) {
@@ -29,9 +29,9 @@ export async function registerCustomer({ restoranAdi, phone, pin, zalSayi }) {
   const trialEndsAt = now + TRIAL_DAYS * 24 * 60 * 60 * 1000;
 
   const zallar = {};
-  for (let i = 1; i <= zalSayi; i++) {
+  for (const ad of zalAdlari) {
     const zalId = push(ref(db, `customers/${customerId}/zallar`)).key;
-    zallar[zalId] = { ad: `Zal ${i}`, createdAt: now };
+    zallar[zalId] = { ad, createdAt: now };
   }
 
   await set(ref(db, `customers/${customerId}`), {

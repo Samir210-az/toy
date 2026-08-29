@@ -6,12 +6,26 @@ import { useAuth } from '../hooks/useAuth';
 export default function Register() {
   const navigate = useNavigate();
   const { login } = useAuth();
-  const [form, setForm] = useState({ restoranAdi: '', phone: '', pin: '', zalSayi: 1 });
+  const [form, setForm] = useState({ restoranAdi: '', phone: '', pin: '' });
+  const [zalAdlari, setZalAdlari] = useState(['']);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
   function update(field, value) {
     setForm((f) => ({ ...f, [field]: value }));
+  }
+
+  function setZalSayi(sayi) {
+    setZalAdlari((prev) => {
+      const next = [...prev];
+      while (next.length < sayi) next.push('');
+      while (next.length > sayi) next.pop();
+      return next;
+    });
+  }
+
+  function updateZalAdi(index, value) {
+    setZalAdlari((prev) => prev.map((ad, i) => (i === index ? value : ad)));
   }
 
   async function handleSubmit(e) {
@@ -22,14 +36,18 @@ export default function Register() {
       setError('PIN kodu ən azı 4 rəqəm olmalıdır.');
       return;
     }
-    if (form.zalSayi < 1) {
+    if (zalAdlari.length < 1) {
       setError('Ən azı 1 zal göstərilməlidir.');
+      return;
+    }
+    if (zalAdlari.some((ad) => !ad.trim())) {
+      setError('Bütün zalların adı doldurulmalıdır.');
       return;
     }
 
     setLoading(true);
     try {
-      const customerId = await registerCustomer(form);
+      const customerId = await registerCustomer({ ...form, zalAdlari: zalAdlari.map((a) => a.trim()) });
       login(customerId);
       navigate('/');
     } catch (err) {
@@ -89,10 +107,24 @@ export default function Register() {
               required
               type="number"
               min={1}
-              value={form.zalSayi}
-              onChange={(e) => update('zalSayi', Number(e.target.value))}
+              value={zalAdlari.length}
+              onChange={(e) => setZalSayi(Math.max(1, Number(e.target.value) || 1))}
               className="w-full rounded-lg bg-white/5 border border-white/10 px-4 py-2.5 text-white outline-none focus:border-indigo-400 transition-colors"
             />
+          </div>
+
+          <div className="space-y-2">
+            <label className="block text-sm text-gray-300">Zalların adları</label>
+            {zalAdlari.map((ad, i) => (
+              <input
+                key={i}
+                required
+                value={ad}
+                onChange={(e) => updateZalAdi(i, e.target.value)}
+                placeholder={`Zal ${i + 1} adı`}
+                className="w-full rounded-lg bg-white/5 border border-white/10 px-4 py-2 text-white text-sm outline-none focus:border-indigo-400 transition-colors"
+              />
+            ))}
           </div>
 
           {error && <p className="text-red-400 text-sm">{error}</p>}
