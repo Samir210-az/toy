@@ -29,7 +29,7 @@ export default function Calendar({ zallar, meclisler, bgImage }) {
         <img
           src={bgImage}
           alt=""
-          className="pointer-events-none select-none absolute -right-6 -bottom-4 h-[115%] w-auto object-contain opacity-[0.14] mix-blend-screen"
+          className="pointer-events-none select-none absolute -right-4 -bottom-4 h-[125%] w-auto object-contain opacity-30 mix-blend-screen"
         />
       )}
 

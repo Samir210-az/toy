@@ -47,7 +47,7 @@ export default function Login() {
         <img
           src="/images/login-couple.png"
           alt=""
-          className="pointer-events-none select-none absolute -right-10 -top-6 h-[80%] w-auto object-contain opacity-[0.16] mix-blend-screen"
+          className="pointer-events-none select-none absolute -right-6 -top-8 h-[95%] w-auto object-contain opacity-30 mix-blend-screen"
         />
 
         <div className="relative z-10">

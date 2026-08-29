@@ -27,7 +27,7 @@ export default function HallGrid({ zallar, meclisler }) {
             <img
               src={image}
               alt=""
-              className="pointer-events-none select-none absolute -right-3 -bottom-3 h-[135%] w-auto object-contain opacity-20 mix-blend-screen"
+              className="pointer-events-none select-none absolute -right-2 -bottom-2 h-[150%] w-auto object-contain opacity-40 mix-blend-screen"
             />
             <div className="relative z-10">
               <div className="flex items-center gap-2 mb-1">
