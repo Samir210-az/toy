@@ -1,9 +1,61 @@
 import { useEffect, useState } from 'react';
-import { ADMIN_PIN, activatePlan, setCustomerStatus, subscribeAllCustomers } from '../utils/db';
+import { ADMIN_PIN, activatePlan, addZal, setCustomerStatus, subscribeAllCustomers } from '../utils/db';
 
 function formatDate(ts) {
   if (!ts) return '—';
   return new Date(ts).toLocaleDateString('az-AZ');
+}
+
+function AddZalRow({ customerId }) {
+  const [open, setOpen] = useState(false);
+  const [name, setName] = useState('');
+  const [saving, setSaving] = useState(false);
+
+  async function handleAdd() {
+    if (!name.trim()) return;
+    setSaving(true);
+    await addZal(customerId, name.trim());
+    setSaving(false);
+    setName('');
+    setOpen(false);
+  }
+
+  if (!open) {
+    return (
+      <button
+        onClick={() => setOpen(true)}
+        className="text-xs px-3 py-1.5 rounded-lg border border-indigo-400/30 text-indigo-400 hover:bg-indigo-500/10"
+      >
+        + Zal əlavə et
+      </button>
+    );
+  }
+
+  return (
+    <div className="flex items-center gap-2">
+      <input
+        autoFocus
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
+        placeholder="Zal adı"
+        className="rounded-lg bg-white/5 border border-white/10 px-2.5 py-1.5 text-xs text-white outline-none focus:border-indigo-400 w-32"
+      />
+      <button
+        onClick={handleAdd}
+        disabled={saving}
+        className="text-xs px-3 py-1.5 rounded-lg bg-indigo-500 hover:bg-indigo-400 text-white disabled:opacity-50"
+      >
+        {saving ? '...' : 'Əlavə et'}
+      </button>
+      <button
+        onClick={() => setOpen(false)}
+        className="text-xs px-2 py-1.5 rounded-lg border border-white/10 text-gray-400"
+      >
+        Ləğv et
+      </button>
+    </div>
+  );
 }
 
 export default function AdminPanel() {
@@ -106,6 +158,7 @@ export default function AdminPanel() {
               >
                 Bloklaşdır
               </button>
+              <AddZalRow customerId={c.id} />
             </div>
           </div>
         ))}
