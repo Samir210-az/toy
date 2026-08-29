@@ -5,6 +5,7 @@ import Register from './pages/Register';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import ZalDetail from './pages/ZalDetail';
+import Anbar from './pages/Anbar';
 import AdminPanel from './pages/AdminPanel';
 
 export default function App() {
@@ -28,6 +29,14 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <ZalDetail />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/anbar"
+            element={
+              <ProtectedRoute>
+                <Anbar />
               </ProtectedRoute>
             }
           />

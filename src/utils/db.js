@@ -136,6 +136,29 @@ export async function deleteMeclis(customerId, meclisId) {
   await remove(ref(db, `customers/${customerId}/meclisler/${meclisId}`));
 }
 
+// ---------- Anbar ----------
+
+export function subscribeAnbarHereketleri(customerId, callback) {
+  return onValue(ref(db, `customers/${customerId}/anbarHereketleri`), (snap) => {
+    const val = snap.val() || {};
+    callback(
+      Object.entries(val)
+        .map(([id, h]) => ({ id, ...h }))
+        .sort((a, b) => (b.tarix || '').localeCompare(a.tarix || '') || b.createdAt - a.createdAt)
+    );
+  });
+}
+
+export async function addAnbarHereket(customerId, hereket) {
+  const hRef = push(ref(db, `customers/${customerId}/anbarHereketleri`));
+  await set(hRef, { ...hereket, createdAt: Date.now() });
+  return hRef.key;
+}
+
+export async function deleteAnbarHereket(customerId, hereketId) {
+  await remove(ref(db, `customers/${customerId}/anbarHereketleri/${hereketId}`));
+}
+
 // ---------- Admin ----------
 
 export function subscribeAllCustomers(callback) {

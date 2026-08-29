@@ -3,6 +3,7 @@ import { useAuth } from '../hooks/useAuth';
 import { subscribeZallar, subscribeMeclisler, getAccessState } from '../utils/db';
 import Header from '../components/Header';
 import HallGrid from '../components/HallGrid';
+import RevenueCard from '../components/RevenueCard';
 import EmptyDaysCard from '../components/EmptyDaysCard';
 import Calendar from '../components/Calendar';
 import AddEventModal from '../components/AddEventModal';
@@ -54,6 +55,8 @@ export default function Dashboard() {
         )}
 
         <HallGrid zallar={zallar} meclisler={meclisler} />
+
+        <RevenueCard zallar={zallar} meclisler={meclisler} />
 
         <EmptyDaysCard meclisler={meclisler} />
 
