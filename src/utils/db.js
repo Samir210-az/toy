@@ -182,6 +182,29 @@ export async function deleteKadrOdenis(customerId, odenisId) {
   await remove(ref(db, `customers/${customerId}/kadrOdenisleri/${odenisId}`));
 }
 
+// ---------- Digər xərclər ----------
+
+export function subscribeDigerXerclar(customerId, callback) {
+  return onValue(ref(db, `customers/${customerId}/digerXerclar`), (snap) => {
+    const val = snap.val() || {};
+    callback(
+      Object.entries(val)
+        .map(([id, x]) => ({ id, ...x }))
+        .sort((a, b) => (b.tarix || '').localeCompare(a.tarix || '') || b.createdAt - a.createdAt)
+    );
+  });
+}
+
+export async function addDigerXerc(customerId, xerc) {
+  const xRef = push(ref(db, `customers/${customerId}/digerXerclar`));
+  await set(xRef, { ...xerc, createdAt: Date.now() });
+  return xRef.key;
+}
+
+export async function deleteDigerXerc(customerId, xercId) {
+  await remove(ref(db, `customers/${customerId}/digerXerclar/${xercId}`));
+}
+
 // ---------- Admin ----------
 
 export function subscribeAllCustomers(callback) {

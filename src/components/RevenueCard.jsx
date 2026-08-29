@@ -11,7 +11,7 @@ const AZ_AYLAR = [
   'İyul', 'Avqust', 'Sentyabr', 'Oktyabr', 'Noyabr', 'Dekabr',
 ];
 
-export default function RevenueCard({ zallar, meclisler, anbarHereketleri = [], kadrOdenisleri = [] }) {
+export default function RevenueCard({ zallar, meclisler, anbarHereketleri = [], kadrOdenisleri = [], digerXerclar = [] }) {
   const stats = useMemo(() => {
     const monthKey = currentMonthKey();
     let monthTotal = 0;
@@ -51,11 +51,12 @@ export default function RevenueCard({ zallar, meclisler, anbarHereketleri = [], 
       .filter((h) => h.tip === 'cixis')
       .reduce((s, h) => s + (Number(h.miqdar) || 0) * (ortaQiymet[h.mehsul] || 0), 0);
     const kadrXerci = kadrOdenisleri.reduce((s, o) => s + (Number(o.meblegh) || 0), 0);
-    const umumiXerc = anbarXerci + kadrXerci;
+    const digerXerc = digerXerclar.reduce((s, x) => s + (Number(x.meblegh) || 0), 0);
+    const umumiXerc = anbarXerci + kadrXerci + digerXerc;
     const xalisGelir = allTimeTotal - umumiXerc;
 
-    return { monthTotal, monthCount, allTimeTotal, perHallList, anbarXerci, kadrXerci, umumiXerc, xalisGelir };
-  }, [zallar, meclisler, anbarHereketleri, kadrOdenisleri]);
+    return { monthTotal, monthCount, allTimeTotal, perHallList, anbarXerci, kadrXerci, digerXerc, umumiXerc, xalisGelir };
+  }, [zallar, meclisler, anbarHereketleri, kadrOdenisleri, digerXerclar]);
 
   const monthLabel = AZ_AYLAR[new Date().getMonth()];
 
@@ -110,6 +111,12 @@ export default function RevenueCard({ zallar, meclisler, anbarHereketleri = [], 
             <span className="text-gray-400">Kadr xərci</span>
             <span className="text-orange-400">− {stats.kadrXerci.toLocaleString('az-AZ')} ₼</span>
           </div>
+          {stats.digerXerc > 0 && (
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-gray-400">Digər xərclər</span>
+              <span className="text-orange-400">− {stats.digerXerc.toLocaleString('az-AZ')} ₼</span>
+            </div>
+          )}
           <div className="flex items-center justify-between pt-1.5 border-t border-white/10">
             <span className="text-white font-medium">Xalis gəlir</span>
             <span className={`text-lg font-semibold ${stats.xalisGelir >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>

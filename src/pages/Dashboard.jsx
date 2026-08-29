@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
-import { subscribeZallar, subscribeMeclisler, subscribeAnbarHereketleri, subscribeKadrOdenisleri, getAccessState } from '../utils/db';
+import { subscribeZallar, subscribeMeclisler, subscribeAnbarHereketleri, subscribeKadrOdenisleri, subscribeDigerXerclar, getAccessState } from '../utils/db';
 import Header from '../components/Header';
 import HallGrid from '../components/HallGrid';
 import RevenueCard from '../components/RevenueCard';
@@ -15,6 +15,7 @@ export default function Dashboard() {
   const [meclisler, setMeclisler] = useState([]);
   const [anbarHereketleri, setAnbarHereketleri] = useState([]);
   const [kadrOdenisleri, setKadrOdenisleri] = useState([]);
+  const [digerXerclar, setDigerXerclar] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
 
   useEffect(() => {
@@ -22,11 +23,13 @@ export default function Dashboard() {
     const unsub2 = subscribeMeclisler(customerId, setMeclisler);
     const unsub3 = subscribeAnbarHereketleri(customerId, setAnbarHereketleri);
     const unsub4 = subscribeKadrOdenisleri(customerId, setKadrOdenisleri);
+    const unsub5 = subscribeDigerXerclar(customerId, setDigerXerclar);
     return () => {
       unsub1();
       unsub2();
       unsub3();
       unsub4();
+      unsub5();
     };
   }, [customerId]);
 
@@ -62,7 +65,7 @@ export default function Dashboard() {
 
         <HallGrid zallar={zallar} meclisler={meclisler} />
 
-        <RevenueCard zallar={zallar} meclisler={meclisler} anbarHereketleri={anbarHereketleri} kadrOdenisleri={kadrOdenisleri} />
+        <RevenueCard zallar={zallar} meclisler={meclisler} anbarHereketleri={anbarHereketleri} kadrOdenisleri={kadrOdenisleri} digerXerclar={digerXerclar} />
 
         <EmptyDaysCard meclisler={meclisler} />
 

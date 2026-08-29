@@ -7,6 +7,7 @@ import Dashboard from './pages/Dashboard';
 import ZalDetail from './pages/ZalDetail';
 import Anbar from './pages/Anbar';
 import Kadr from './pages/Kadr';
+import DigerXerclar from './pages/DigerXerclar';
 import AdminPanel from './pages/AdminPanel';
 
 export default function App() {
@@ -46,6 +47,14 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <Kadr />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/xerc"
+            element={
+              <ProtectedRoute>
+                <DigerXerclar />
               </ProtectedRoute>
             }
           />

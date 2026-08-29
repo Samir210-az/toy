@@ -10,7 +10,7 @@ import {
 } from '../utils/db';
 import Footer from '../components/Footer';
 
-const ROLLAR = ['Ofisiant', 'Musiqiçi', 'Aşpaz', 'Salatçı', 'Xadimə'];
+const ROLLAR = ['Ofisiant', 'Musiqiçi', 'Aşpaz', 'Kababçı', 'Salatçı', 'Xadimə'];
 
 function todayStr() {
   const d = new Date();
