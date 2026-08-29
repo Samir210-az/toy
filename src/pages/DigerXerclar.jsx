@@ -10,6 +10,8 @@ import {
 } from '../utils/db';
 import Footer from '../components/Footer';
 
+const PRESET_XERCLER = ['İcarə haqqı', 'İşıq haqqı', 'Qaz haqqı', 'Su haqqı', 'Vergi'];
+
 function todayStr() {
   const d = new Date();
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
@@ -17,11 +19,15 @@ function todayStr() {
 
 function XercForm({ meclisler, zallar, onClose, customerId }) {
   const [ad, setAd] = useState('');
+  const [customAd, setCustomAd] = useState('');
   const [meblegh, setMeblegh] = useState('');
   const [tarix, setTarix] = useState(todayStr());
   const [meclisId, setMeclisId] = useState('');
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
+
+  const isCustom = ad === '__custom__';
+  const secilmisAd = isCustom ? customAd.trim() : ad;
 
   const meclisSiyahisi = useMemo(
     () => [...meclisler].sort((a, b) => b.tarix.localeCompare(a.tarix)),
@@ -33,8 +39,8 @@ function XercForm({ meclisler, zallar, onClose, customerId }) {
   async function handleSubmit(e) {
     e.preventDefault();
     setError('');
-    if (!ad.trim()) {
-      setError('Xərcin adı yazılmalıdır.');
+    if (!secilmisAd) {
+      setError('Xərcin adı seçilməli və ya yazılmalıdır.');
       return;
     }
     if (!meblegh || Number(meblegh) <= 0) {
@@ -44,7 +50,7 @@ function XercForm({ meclisler, zallar, onClose, customerId }) {
     setSaving(true);
     try {
       await addDigerXerc(customerId, {
-        ad: ad.trim(),
+        ad: secilmisAd,
         meblegh: Number(meblegh),
         tarix,
         meclisId: secilmisMeclis ? secilmisMeclis.id : null,
@@ -70,14 +76,27 @@ function XercForm({ meclisler, zallar, onClose, customerId }) {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm text-gray-300 mb-1">Xərcin adı</label>
-            <input
-              autoFocus
+            <label className="block text-sm text-gray-300 mb-1">Xərcin növü</label>
+            <select
               value={ad}
               onChange={(e) => setAd(e.target.value)}
-              placeholder="Məs: İcarə haqqı, İşıq haqqı, Təmir"
               className="w-full rounded-lg bg-white/5 border border-white/10 px-3 py-2 text-white outline-none focus:border-indigo-400"
-            />
+            >
+              <option value="">Seçin</option>
+              {PRESET_XERCLER.map((x) => (
+                <option key={x} value={x}>{x}</option>
+              ))}
+              <option value="__custom__">+ Yeni xərc əlavə et...</option>
+            </select>
+            {isCustom && (
+              <input
+                autoFocus
+                value={customAd}
+                onChange={(e) => setCustomAd(e.target.value)}
+                placeholder="Xərcin adı"
+                className="w-full mt-2 rounded-lg bg-white/5 border border-white/10 px-3 py-2 text-white outline-none focus:border-indigo-400"
+              />
+            )}
           </div>
 
           <div className="grid grid-cols-2 gap-3">
