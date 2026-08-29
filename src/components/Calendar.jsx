@@ -54,13 +54,14 @@ export default function Calendar({ zallar, meclisler }) {
           const events = meclislerByDay[key] || [];
           const hasEvents = events.length > 0;
           const selected = key === selectedKey;
+          const primaryColor = hasEvents ? getZalColor(events[0].zalId, zallar) : null;
 
           return (
             <button
               key={key}
               onClick={() => setSelectedKey(selected ? null : key)}
               className={`aspect-square rounded-lg flex flex-col items-center justify-center gap-0.5 text-sm transition-colors
-                ${hasEvents ? 'bg-indigo-500/15 text-white' : 'text-gray-400 hover:bg-white/5'}
+                ${hasEvents ? `${primaryColor.strong} text-white font-semibold` : 'text-gray-400 hover:bg-white/5'}
                 ${isToday(date) ? 'ring-1 ring-indigo-400' : ''}
                 ${selected ? 'ring-2 ring-white' : ''}`}
             >
