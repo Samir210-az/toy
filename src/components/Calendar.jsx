@@ -1,19 +1,12 @@
 import { useMemo, useState } from 'react';
 import { formatDateKey, getMonthDays, getMonthLabel, isToday, AZ_GUNLER } from '../utils/dateUtils';
-
-const ZAL_RENGLERI = [
-  'bg-indigo-500', 'bg-rose-500', 'bg-amber-500', 'bg-emerald-500',
-  'bg-sky-500', 'bg-fuchsia-500', 'bg-orange-500', 'bg-teal-500',
-];
-
-function zalRengi(zalId, zallar) {
-  const index = zallar.findIndex((z) => z.id === zalId);
-  return ZAL_RENGLERI[index % ZAL_RENGLERI.length] || 'bg-gray-500';
-}
+import { getZalColor } from '../utils/colors';
+import MeclisDetailModal from './MeclisDetailModal';
 
 export default function Calendar({ zallar, meclisler }) {
   const [cursor, setCursor] = useState(new Date());
   const [selectedKey, setSelectedKey] = useState(null);
+  const [detailMeclis, setDetailMeclis] = useState(null);
 
   const year = cursor.getFullYear();
   const month = cursor.getMonth();
@@ -75,10 +68,7 @@ export default function Calendar({ zallar, meclisler }) {
               {hasEvents && (
                 <span className="flex gap-0.5">
                   {events.slice(0, 3).map((e) => (
-                    <span
-                      key={e.id}
-                      className={`w-1.5 h-1.5 rounded-full ${zalRengi(e.zalId, zallar)}`}
-                    />
+                    <span key={e.id} className={`w-1.5 h-1.5 rounded-full ${getZalColor(e.zalId, zallar).dot}`} />
                   ))}
                 </span>
               )}
@@ -93,18 +83,36 @@ export default function Calendar({ zallar, meclisler }) {
           {(meclislerByDay[selectedKey] || []).length === 0 && (
             <p className="text-sm text-gray-600">Bu tarixdə məclis yoxdur.</p>
           )}
-          {(meclislerByDay[selectedKey] || []).map((m) => (
-            <div key={m.id} className="rounded-lg bg-white/5 border border-white/10 p-3 flex items-center justify-between">
-              <div>
-                <p className="text-white text-sm font-medium">{m.adFamiliya}</p>
-                <p className="text-xs text-gray-500">
-                  {zalAdi(m.zalId)} · {m.saat} · {m.qonaqSayi} qonaq
-                </p>
-              </div>
-              <p className="text-sm text-emerald-400 font-medium">{m.cemi} ₼</p>
-            </div>
-          ))}
+          {(meclislerByDay[selectedKey] || []).map((m) => {
+            const color = getZalColor(m.zalId, zallar);
+            return (
+              <button
+                key={m.id}
+                onClick={() => setDetailMeclis(m)}
+                className={`w-full text-left rounded-lg bg-white/5 border ${color.border} hover:bg-white/10 transition-colors p-3 flex items-center justify-between`}
+              >
+                <div className="flex items-center gap-2 min-w-0">
+                  <span className={`w-2 h-2 rounded-full shrink-0 ${color.dot}`} />
+                  <div className="min-w-0">
+                    <p className="text-white text-sm font-medium truncate">{m.adFamiliya}</p>
+                    <p className="text-xs text-gray-500 truncate">
+                      {zalAdi(m.zalId)} · {m.saat} · {m.qonaqSayi} qonaq
+                    </p>
+                  </div>
+                </div>
+                <p className="text-sm text-emerald-400 font-medium shrink-0 ml-2">{m.cemi} ₼</p>
+              </button>
+            );
+          })}
         </div>
+      )}
+
+      {detailMeclis && (
+        <MeclisDetailModal
+          meclis={detailMeclis}
+          zalAdi={zalAdi(detailMeclis.zalId)}
+          onClose={() => setDetailMeclis(null)}
+        />
       )}
     </div>
   );

@@ -4,6 +4,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Register from './pages/Register';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
+import ZalDetail from './pages/ZalDetail';
 import AdminPanel from './pages/AdminPanel';
 
 export default function App() {
@@ -19,6 +20,14 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/zal/:zalId"
+            element={
+              <ProtectedRoute>
+                <ZalDetail />
               </ProtectedRoute>
             }
           />
