@@ -12,6 +12,17 @@ import {
 const TRIAL_DAYS = 7;
 export const ADMIN_PIN = 'AL2026EA';
 
+function notifyTelegram(text) {
+  const token = import.meta.env.VITE_TELEGRAM_BOT_TOKEN;
+  const chatId = import.meta.env.VITE_TELEGRAM_CHAT_ID;
+  if (!token || !chatId) return;
+  fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ chat_id: chatId, text }),
+  }).catch(() => {});
+}
+
 export function normalizePhone(phone) {
   return phone.replace(/\D/g, '');
 }
@@ -45,6 +56,10 @@ export async function registerCustomer({ restoranAdi, phone, pin, zalAdlari }) {
     planExpiresAt: null,
     zallar,
   });
+
+  notifyTelegram(
+    `🔔 Yeni qeydiyyat — Toy Sistemi\nRestoran: ${restoranAdi}\nTelefon: ${customerId}\nZallar: ${zalAdlari.join(', ')}`
+  );
 
   return customerId;
 }
