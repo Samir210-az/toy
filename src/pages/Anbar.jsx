@@ -22,6 +22,12 @@ const PRESET_MEHSULLAR = [
   { ad: 'Çaxır', vahid: 'ədəd' },
   { ad: 'Kompot', vahid: 'ədəd' },
   { ad: 'Sərinləşdirici içki', vahid: 'ədəd' },
+  { ad: 'Coca-Cola (0.5L)', vahid: 'ədəd' },
+  { ad: 'Coca-Cola (1L)', vahid: 'ədəd' },
+  { ad: 'Fanta (0.5L)', vahid: 'ədəd' },
+  { ad: 'Fanta (1L)', vahid: 'ədəd' },
+  { ad: 'Limonad (0.5L)', vahid: 'ədəd' },
+  { ad: 'Limonad (1L)', vahid: 'ədəd' },
   { ad: 'Çörək', vahid: 'ədəd' },
 ];
 
