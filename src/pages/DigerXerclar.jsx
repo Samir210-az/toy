@@ -17,7 +17,7 @@ function todayStr() {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
 
-function XercForm({ meclisler, zallar, onClose, customerId }) {
+function XercForm({ meclisler, zallar, xercTipleri, onClose, customerId }) {
   const [ad, setAd] = useState('');
   const [customAd, setCustomAd] = useState('');
   const [meblegh, setMeblegh] = useState('');
@@ -83,7 +83,7 @@ function XercForm({ meclisler, zallar, onClose, customerId }) {
               className="w-full rounded-lg bg-white/5 border border-white/10 px-3 py-2 text-white outline-none focus:border-indigo-400"
             >
               <option value="">Seçin</option>
-              {PRESET_XERCLER.map((x) => (
+              {xercTipleri.map((x) => (
                 <option key={x} value={x}>{x}</option>
               ))}
               <option value="__custom__">+ Yeni xərc əlavə et...</option>
@@ -174,6 +174,12 @@ export default function DigerXerclar() {
 
   const cemi = useMemo(() => xerclar.reduce((s, x) => s + (Number(x.meblegh) || 0), 0), [xerclar]);
 
+  const xercTipleri = useMemo(() => {
+    const set = new Set(PRESET_XERCLER);
+    xerclar.forEach((x) => set.add(x.ad));
+    return [...set];
+  }, [xerclar]);
+
   async function handleDelete(id) {
     await deleteDigerXerc(customerId, id);
     setConfirmDeleteId(null);
@@ -256,7 +262,7 @@ export default function DigerXerclar() {
       <Footer />
 
       {formOpen && (
-        <XercForm meclisler={meclisler} zallar={zallar} onClose={() => setFormOpen(false)} customerId={customerId} />
+        <XercForm meclisler={meclisler} zallar={zallar} xercTipleri={xercTipleri} onClose={() => setFormOpen(false)} customerId={customerId} />
       )}
     </div>
   );

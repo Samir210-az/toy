@@ -17,7 +17,7 @@ function todayStr() {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
 
-function OdenisForm({ meclisler, zallar, onClose, customerId }) {
+function OdenisForm({ meclisler, zallar, rollar, onClose, customerId }) {
   const [rol, setRol] = useState('');
   const [customRol, setCustomRol] = useState('');
   const [ad, setAd] = useState('');
@@ -100,7 +100,7 @@ function OdenisForm({ meclisler, zallar, onClose, customerId }) {
               className="w-full rounded-lg bg-white/5 border border-white/10 px-3 py-2 text-white outline-none focus:border-indigo-400"
             >
               <option value="">Seçin</option>
-              {ROLLAR.map((r) => (
+              {rollar.map((r) => (
                 <option key={r} value={r}>{r}</option>
               ))}
               <option value="__custom__">Digər (özün yaz)...</option>
@@ -235,6 +235,12 @@ export default function Kadr() {
 
   const cemi = useMemo(() => odenisler.reduce((s, o) => s + (Number(o.meblegh) || 0), 0), [odenisler]);
 
+  const rolList = useMemo(() => {
+    const set = new Set(ROLLAR);
+    odenisler.forEach((o) => set.add(o.rol));
+    return [...set];
+  }, [odenisler]);
+
   const perRol = useMemo(() => {
     const map = {};
     for (const o of odenisler) {
@@ -339,7 +345,7 @@ export default function Kadr() {
       <Footer />
 
       {formOpen && (
-        <OdenisForm meclisler={meclisler} zallar={zallar} onClose={() => setFormOpen(false)} customerId={customerId} />
+        <OdenisForm meclisler={meclisler} zallar={zallar} rollar={rolList} onClose={() => setFormOpen(false)} customerId={customerId} />
       )}
     </div>
   );
