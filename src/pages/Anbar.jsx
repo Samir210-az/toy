@@ -133,12 +133,12 @@ function HereketForm({ tip, mehsullar, meclisler, zallar, onClose, customerId })
                   value={customMehsul}
                   onChange={(e) => setCustomMehsul(e.target.value)}
                   placeholder="Məhsulun adı"
-                  className="flex-1 rounded-lg bg-white/5 border border-white/10 px-3 py-2 text-white outline-none focus:border-indigo-400"
+                  className="flex-1 min-w-0 rounded-lg bg-white/5 border border-white/10 px-3 py-2 text-white outline-none focus:border-indigo-400"
                 />
                 <select
                   value={customVahid}
                   onChange={(e) => setCustomVahid(e.target.value)}
-                  className="rounded-lg bg-white/5 border border-white/10 px-3 py-2 text-white outline-none focus:border-indigo-400"
+                  className="shrink-0 w-24 rounded-lg bg-white/5 border border-white/10 px-2 py-2 text-white outline-none focus:border-indigo-400"
                 >
                   <option value="kq">kq</option>
                   <option value="ədəd">ədəd</option>
@@ -273,7 +273,7 @@ function AnbarciPinPanel({ customerId, mevcudPin }) {
       )}
 
       {editing ? (
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <input
             autoFocus
             inputMode="numeric"
@@ -281,18 +281,18 @@ function AnbarciPinPanel({ customerId, mevcudPin }) {
             onChange={(e) => setPin(e.target.value.replace(/\D/g, ''))}
             placeholder="Yeni PIN (min. 4 rəqəm)"
             maxLength={8}
-            className="flex-1 rounded-lg bg-white/5 border border-white/10 px-3 py-2 text-sm text-white outline-none focus:border-indigo-400"
+            className="flex-1 min-w-[140px] rounded-lg bg-white/5 border border-white/10 px-3 py-2 text-sm text-white outline-none focus:border-indigo-400"
           />
           <button
             onClick={handleSave}
             disabled={saving || pin.length < 4}
-            className="rounded-lg bg-indigo-500 hover:bg-indigo-400 px-3 py-2 text-sm text-white disabled:opacity-50"
+            className="shrink-0 rounded-lg bg-indigo-500 hover:bg-indigo-400 px-3 py-2 text-sm text-white disabled:opacity-50"
           >
             Yadda saxla
           </button>
           <button
             onClick={() => { setEditing(false); setPin(''); }}
-            className="rounded-lg border border-white/10 px-3 py-2 text-sm text-gray-400"
+            className="shrink-0 rounded-lg border border-white/10 px-3 py-2 text-sm text-gray-400"
           >
             Ləğv
           </button>

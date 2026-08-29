@@ -223,7 +223,7 @@ export default function AddEventModal({ zallar, onClose }) {
                     placeholder="Xidmətin adı"
                     value={row.ad}
                     onChange={(e) => updateXercRow(i, 'ad', e.target.value)}
-                    className="flex-1 rounded-lg bg-white/5 border border-white/10 px-3 py-2 text-sm text-white outline-none focus:border-indigo-400"
+                    className="flex-1 min-w-0 rounded-lg bg-white/5 border border-white/10 px-3 py-2 text-sm text-white outline-none focus:border-indigo-400"
                   />
                   <input
                     type="number"
@@ -231,12 +231,12 @@ export default function AddEventModal({ zallar, onClose }) {
                     placeholder="₼"
                     value={row.qiymet}
                     onChange={(e) => updateXercRow(i, 'qiymet', e.target.value)}
-                    className="w-24 rounded-lg bg-white/5 border border-white/10 px-3 py-2 text-sm text-white outline-none focus:border-indigo-400"
+                    className="w-20 shrink-0 rounded-lg bg-white/5 border border-white/10 px-2 py-2 text-sm text-white outline-none focus:border-indigo-400"
                   />
                   <button
                     type="button"
                     onClick={() => removeXercRow(i)}
-                    className="text-gray-500 hover:text-red-400 px-1"
+                    className="shrink-0 text-gray-500 hover:text-red-400 px-1"
                   >
                     ×
                   </button>
