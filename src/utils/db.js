@@ -146,3 +146,7 @@ export async function activatePlan(customerId, planType) {
 export async function setCustomerStatus(customerId, status) {
   await update(ref(db, `customers/${customerId}`), { status });
 }
+
+export async function deleteCustomer(customerId) {
+  await remove(ref(db, `customers/${customerId}`));
+}

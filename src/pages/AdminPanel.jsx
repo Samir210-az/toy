@@ -1,9 +1,49 @@
 import { useEffect, useState } from 'react';
-import { ADMIN_PIN, activatePlan, addZal, setCustomerStatus, subscribeAllCustomers } from '../utils/db';
+import { ADMIN_PIN, activatePlan, addZal, deleteCustomer, setCustomerStatus, subscribeAllCustomers } from '../utils/db';
 
 function formatDate(ts) {
   if (!ts) return '—';
   return new Date(ts).toLocaleDateString('az-AZ');
+}
+
+function DeleteCustomerButton({ customerId, restoranAdi }) {
+  const [confirming, setConfirming] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  async function handleDelete() {
+    setDeleting(true);
+    await deleteCustomer(customerId);
+  }
+
+  if (!confirming) {
+    return (
+      <button
+        onClick={() => setConfirming(true)}
+        className="text-xs px-3 py-1.5 rounded-lg border border-red-500/40 text-red-400 hover:bg-red-500/10"
+      >
+        Sil
+      </button>
+    );
+  }
+
+  return (
+    <div className="flex items-center gap-2">
+      <span className="text-xs text-red-300">"{restoranAdi}" tam silinsin?</span>
+      <button
+        onClick={handleDelete}
+        disabled={deleting}
+        className="text-xs px-3 py-1.5 rounded-lg bg-red-500 hover:bg-red-400 text-white disabled:opacity-50"
+      >
+        {deleting ? 'Silinir...' : 'Bəli, sil'}
+      </button>
+      <button
+        onClick={() => setConfirming(false)}
+        className="text-xs px-2 py-1.5 rounded-lg border border-white/10 text-gray-400"
+      >
+        Ləğv et
+      </button>
+    </div>
+  );
 }
 
 function AddZalRow({ customerId }) {
@@ -158,6 +198,9 @@ export default function AdminPanel() {
               >
                 Bloklaşdır
               </button>
+              {c.status === 'expired' && (
+                <DeleteCustomerButton customerId={c.id} restoranAdi={c.restoranAdi} />
+              )}
               <AddZalRow customerId={c.id} />
             </div>
           </div>
