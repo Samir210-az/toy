@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { formatDateKey, getMonthDays, getMonthLabel, isToday, AZ_GUNLER } from '../utils/dateUtils';
-import { getZalColor } from '../utils/colors';
+import { getZalColor, hexToRgba } from '../utils/colors';
 import MeclisDetailModal from './MeclisDetailModal';
 
 export default function Calendar({ zallar, meclisler, bgImage }) {
@@ -63,14 +63,23 @@ export default function Calendar({ zallar, meclisler, bgImage }) {
           const events = meclislerByDay[key] || [];
           const hasEvents = events.length > 0;
           const selected = key === selectedKey;
-          const primaryColor = hasEvents ? getZalColor(events[0].zalId, zallar) : null;
+          const uniqueZalIds = [...new Set(events.map((e) => e.zalId))];
+          const isSplit = uniqueZalIds.length >= 2;
+          const dayBg = !hasEvents
+            ? undefined
+            : isSplit
+            ? {
+                backgroundImage: `linear-gradient(135deg, ${hexToRgba(getZalColor(uniqueZalIds[0], zallar).hex, 0.65)} 50%, ${hexToRgba(getZalColor(uniqueZalIds[1], zallar).hex, 0.65)} 50%)`,
+              }
+            : { backgroundColor: hexToRgba(getZalColor(uniqueZalIds[0], zallar).hex, 0.55) };
 
           return (
             <button
               key={key}
               onClick={() => setSelectedKey(selected ? null : key)}
+              style={dayBg}
               className={`aspect-square rounded-lg flex flex-col items-center justify-center gap-0.5 text-sm transition-colors
-                ${hasEvents ? `${primaryColor.strong} text-white font-semibold` : 'text-gray-400 hover:bg-white/5'}
+                ${hasEvents ? 'text-white font-semibold' : 'text-gray-400 hover:bg-white/5'}
                 ${isToday(date) ? 'ring-1 ring-indigo-400' : ''}
                 ${selected ? 'ring-2 ring-white' : ''}`}
             >
