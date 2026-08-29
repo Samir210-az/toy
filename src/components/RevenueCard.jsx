@@ -33,9 +33,23 @@ export default function RevenueCard({ zallar, meclisler, anbarHereketleri = [], 
       .map((z) => ({ zal: z, total: perHall[z.id] || 0 }))
       .sort((a, b) => b.total - a.total);
 
+    // Hər məhsulun orta alış qiyməti (giriş hərəkətlərindən, çəkili orta)
+    const girisMap = {};
+    for (const h of anbarHereketleri) {
+      if (h.tip !== 'giris') continue;
+      if (!girisMap[h.mehsul]) girisMap[h.mehsul] = { miqdar: 0, cemi: 0 };
+      girisMap[h.mehsul].miqdar += Number(h.miqdar) || 0;
+      girisMap[h.mehsul].cemi += Number(h.cemi) || 0;
+    }
+    const ortaQiymet = {};
+    for (const [mehsul, { miqdar, cemi }] of Object.entries(girisMap)) {
+      ortaQiymet[mehsul] = miqdar > 0 ? cemi / miqdar : 0;
+    }
+
+    // Anbar xərci = anbardan ÇIXIB toya/istifadəyə verilən malların dəyəri (orta alış qiyməti ilə)
     const anbarXerci = anbarHereketleri
-      .filter((h) => h.tip === 'giris')
-      .reduce((s, h) => s + (Number(h.cemi) || 0), 0);
+      .filter((h) => h.tip === 'cixis')
+      .reduce((s, h) => s + (Number(h.miqdar) || 0) * (ortaQiymet[h.mehsul] || 0), 0);
     const kadrXerci = kadrOdenisleri.reduce((s, o) => s + (Number(o.meblegh) || 0), 0);
     const umumiXerc = anbarXerci + kadrXerci;
     const xalisGelir = allTimeTotal - umumiXerc;
@@ -89,7 +103,7 @@ export default function RevenueCard({ zallar, meclisler, anbarHereketleri = [], 
       {stats.umumiXerc > 0 && (
         <div className="border-t border-white/10 pt-3 space-y-1.5">
           <div className="flex items-center justify-between text-sm">
-            <span className="text-gray-400">Anbar xərci</span>
+            <span className="text-gray-400">Anbar xərci (istifadə olunan mal)</span>
             <span className="text-orange-400">− {stats.anbarXerci.toLocaleString('az-AZ')} ₼</span>
           </div>
           <div className="flex items-center justify-between text-sm">
