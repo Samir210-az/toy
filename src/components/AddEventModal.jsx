@@ -12,6 +12,7 @@ const PRESET_XIDMETLER = [
 const BOS_FORM = {
   zalId: '',
   adFamiliya: '',
+  telefon: '',
   tarix: '',
   saat: '19:00',
   qonaqSayi: '',
@@ -71,6 +72,7 @@ export default function AddEventModal({ zallar, onClose }) {
       await addMeclis(customerId, {
         zalId: form.zalId,
         adFamiliya: form.adFamiliya,
+        telefon: form.telefon,
         tarix: form.tarix,
         saat: form.saat,
         qonaqSayi: Number(form.qonaqSayi) || 0,
@@ -125,6 +127,17 @@ export default function AddEventModal({ zallar, onClose }) {
                 required
                 value={form.adFamiliya}
                 onChange={(e) => update('adFamiliya', e.target.value)}
+                className="w-full rounded-lg bg-white/5 border border-white/10 px-3 py-2 text-white outline-none focus:border-indigo-400"
+              />
+            </div>
+
+            <div className="col-span-2">
+              <label className="block text-sm text-gray-300 mb-1">Telefon nömrəsi</label>
+              <input
+                type="tel"
+                value={form.telefon}
+                onChange={(e) => update('telefon', e.target.value)}
+                placeholder="0501234567"
                 className="w-full rounded-lg bg-white/5 border border-white/10 px-3 py-2 text-white outline-none focus:border-indigo-400"
               />
             </div>

@@ -35,6 +35,30 @@ export default function MeclisDetailModal({ meclis, zalAdi, onClose }) {
 
         <div className="space-y-3 text-sm">
           <Row label="Zal" value={zalAdi} />
+          {meclis.telefon && (
+            <div className="flex items-center justify-between">
+              <span className="text-gray-400">Telefon</span>
+              <div className="flex items-center gap-2">
+                <span className="text-white">{meclis.telefon}</span>
+                <a
+                  href={`tel:${meclis.telefon.replace(/\s/g, '')}`}
+                  className="w-8 h-8 rounded-lg bg-indigo-500/15 hover:bg-indigo-500/25 flex items-center justify-center text-indigo-400 transition-colors"
+                  title="Zəng et"
+                >
+                  📞
+                </a>
+                <a
+                  href={`https://wa.me/${meclis.telefon.replace(/\D/g, '')}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-8 h-8 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 flex items-center justify-center text-emerald-400 transition-colors"
+                  title="WhatsApp"
+                >
+                  💬
+                </a>
+              </div>
+            </div>
+          )}
           <Row label="Tarix" value={meclis.tarix} />
           <Row label="Saat" value={meclis.saat} />
           <Row label="Qonaq sayı" value={meclis.qonaqSayi} />
