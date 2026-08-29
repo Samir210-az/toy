@@ -22,6 +22,8 @@ function OdenisForm({ meclisler, zallar, onClose, customerId }) {
   const [customRol, setCustomRol] = useState('');
   const [ad, setAd] = useState('');
   const [meblegh, setMeblegh] = useState('');
+  const [sayNefer, setSayNefer] = useState('');
+  const [vahidMevacib, setVahidMevacib] = useState('');
   const [tarix, setTarix] = useState(todayStr());
   const [meclisId, setMeclisId] = useState('');
   const [error, setError] = useState('');
@@ -29,6 +31,8 @@ function OdenisForm({ meclisler, zallar, onClose, customerId }) {
 
   const isCustom = rol === '__custom__';
   const secilmisRol = isCustom ? customRol.trim() : rol;
+  const isOfisiant = rol === 'Ofisiant';
+  const hesablanmisMeblegh = isOfisiant ? (Number(sayNefer) || 0) * (Number(vahidMevacib) || 0) : Number(meblegh) || 0;
 
   const meclisSiyahisi = useMemo(
     () => [...meclisler].sort((a, b) => b.tarix.localeCompare(a.tarix)),
@@ -44,7 +48,16 @@ function OdenisForm({ meclisler, zallar, onClose, customerId }) {
       setError('Vəzifə seçilməlidir.');
       return;
     }
-    if (!meblegh || Number(meblegh) <= 0) {
+    if (isOfisiant) {
+      if (!sayNefer || Number(sayNefer) <= 0) {
+        setError('Nəfər sayı düzgün daxil edilməlidir.');
+        return;
+      }
+      if (!vahidMevacib || Number(vahidMevacib) <= 0) {
+        setError('Bir nəfərə məvacib düzgün daxil edilməlidir.');
+        return;
+      }
+    } else if (!meblegh || Number(meblegh) <= 0) {
       setError('Məbləğ düzgün daxil edilməlidir.');
       return;
     }
@@ -53,7 +66,9 @@ function OdenisForm({ meclisler, zallar, onClose, customerId }) {
       await addKadrOdenis(customerId, {
         rol: secilmisRol,
         ad: ad.trim() || null,
-        meblegh: Number(meblegh),
+        meblegh: hesablanmisMeblegh,
+        sayNefer: isOfisiant ? Number(sayNefer) : null,
+        vahidMevacib: isOfisiant ? Number(vahidMevacib) : null,
         tarix,
         meclisId: secilmisMeclis ? secilmisMeclis.id : null,
         meclisAd: secilmisMeclis ? secilmisMeclis.adFamiliya : null,
@@ -101,17 +116,50 @@ function OdenisForm({ meclisler, zallar, onClose, customerId }) {
             )}
           </div>
 
-          <div>
-            <label className="block text-sm text-gray-300 mb-1">Ad (istəyə görə)</label>
-            <input
-              value={ad}
-              onChange={(e) => setAd(e.target.value)}
-              placeholder="İşçinin adı"
-              className="w-full rounded-lg bg-white/5 border border-white/10 px-3 py-2 text-white outline-none focus:border-indigo-400"
-            />
-          </div>
+          {!isOfisiant && (
+            <div>
+              <label className="block text-sm text-gray-300 mb-1">Ad (istəyə görə)</label>
+              <input
+                value={ad}
+                onChange={(e) => setAd(e.target.value)}
+                placeholder="İşçinin adı"
+                className="w-full rounded-lg bg-white/5 border border-white/10 px-3 py-2 text-white outline-none focus:border-indigo-400"
+              />
+            </div>
+          )}
 
-          <div className="grid grid-cols-2 gap-3">
+          {isOfisiant ? (
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-sm text-gray-300 mb-1">Nəfər sayı</label>
+                <input
+                  type="number"
+                  min={0}
+                  value={sayNefer}
+                  onChange={(e) => setSayNefer(e.target.value)}
+                  placeholder="20"
+                  className="w-full rounded-lg bg-white/5 border border-white/10 px-3 py-2 text-white outline-none focus:border-indigo-400"
+                />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-300 mb-1">1 nəfərə məvacib (₼)</label>
+                <input
+                  type="number"
+                  min={0}
+                  step="0.01"
+                  value={vahidMevacib}
+                  onChange={(e) => setVahidMevacib(e.target.value)}
+                  placeholder="40"
+                  className="w-full rounded-lg bg-white/5 border border-white/10 px-3 py-2 text-white outline-none focus:border-indigo-400"
+                />
+              </div>
+              {hesablanmisMeblegh > 0 && (
+                <p className="col-span-2 text-xs text-gray-500">
+                  {sayNefer || 0} × {vahidMevacib || 0} ₼ = <span className="text-rose-400 font-medium">{hesablanmisMeblegh.toLocaleString('az-AZ')} ₼</span>
+                </p>
+              )}
+            </div>
+          ) : (
             <div>
               <label className="block text-sm text-gray-300 mb-1">Məbləğ (₼)</label>
               <input
@@ -123,15 +171,16 @@ function OdenisForm({ meclisler, zallar, onClose, customerId }) {
                 className="w-full rounded-lg bg-white/5 border border-white/10 px-3 py-2 text-white outline-none focus:border-indigo-400"
               />
             </div>
-            <div>
-              <label className="block text-sm text-gray-300 mb-1">Tarix</label>
-              <input
-                type="date"
-                value={tarix}
-                onChange={(e) => setTarix(e.target.value)}
-                className="w-full rounded-lg bg-white/5 border border-white/10 px-3 py-2 text-white outline-none focus:border-indigo-400"
-              />
-            </div>
+          )}
+
+          <div>
+            <label className="block text-sm text-gray-300 mb-1">Tarix</label>
+            <input
+              type="date"
+              value={tarix}
+              onChange={(e) => setTarix(e.target.value)}
+              className="w-full rounded-lg bg-white/5 border border-white/10 px-3 py-2 text-white outline-none focus:border-indigo-400"
+            />
           </div>
 
           <div>
@@ -248,7 +297,8 @@ export default function Kadr() {
               >
                 <div className="min-w-0">
                   <p className="text-white text-sm truncate">
-                    {o.rol}{o.ad ? ` — ${o.ad}` : ''}
+                    {o.rol}
+                    {o.sayNefer ? ` — ${o.sayNefer} nəfər × ${o.vahidMevacib} ₼` : o.ad ? ` — ${o.ad}` : ''}
                   </p>
                   <p className="text-xs text-gray-500 truncate">
                     {o.tarix}{o.meclisAd ? ` · 🎊 ${o.meclisAd}` : ''}
