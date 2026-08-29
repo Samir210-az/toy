@@ -5,8 +5,19 @@ import { subscribeAnbarHereketleri, addAnbarHereket, deleteAnbarHereket } from '
 import Footer from '../components/Footer';
 
 const PRESET_MEHSULLAR = [
-  'Quzu əti', 'Mal əti', 'Toyuq', 'Balıq',
-  'Xiyar', 'Pomidor', 'Kartof', 'Soğan', 'Yaşıl göyərti',
+  { ad: 'Quzu əti', vahid: 'kq' },
+  { ad: 'Mal əti', vahid: 'kq' },
+  { ad: 'Toyuq', vahid: 'kq' },
+  { ad: 'Balıq', vahid: 'kq' },
+  { ad: 'Xiyar', vahid: 'kq' },
+  { ad: 'Pomidor', vahid: 'kq' },
+  { ad: 'Kartof', vahid: 'kq' },
+  { ad: 'Soğan', vahid: 'kq' },
+  { ad: 'Yaşıl göyərti', vahid: 'kq' },
+  { ad: 'Su (0.5L)', vahid: 'ədəd' },
+  { ad: 'Su (1.5L)', vahid: 'ədəd' },
+  { ad: 'Sərinləşdirici içki', vahid: 'ədəd' },
+  { ad: 'Çörək', vahid: 'ədəd' },
 ];
 
 function todayStr() {
@@ -17,15 +28,18 @@ function todayStr() {
 function HereketForm({ tip, mehsullar, onClose, customerId }) {
   const [mehsul, setMehsul] = useState('');
   const [customMehsul, setCustomMehsul] = useState('');
+  const [customVahid, setCustomVahid] = useState('kq');
   const [miqdar, setMiqdar] = useState('');
-  const [qiymetKq, setQiymetKq] = useState('');
+  const [qiymetVahid, setQiymetVahid] = useState('');
   const [tarix, setTarix] = useState(todayStr());
   const [qeyd, setQeyd] = useState('');
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
 
-  const secilmisMehsul = mehsul === '__custom__' ? customMehsul.trim() : mehsul;
-  const cemi = tip === 'giris' ? (Number(miqdar) || 0) * (Number(qiymetKq) || 0) : null;
+  const isCustom = mehsul === '__custom__';
+  const secilmisMehsul = isCustom ? customMehsul.trim() : mehsul;
+  const secilmisVahid = isCustom ? customVahid : (mehsullar.find((m) => m.ad === mehsul)?.vahid || 'kq');
+  const cemi = tip === 'giris' ? (Number(miqdar) || 0) * (Number(qiymetVahid) || 0) : null;
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -43,8 +57,9 @@ function HereketForm({ tip, mehsullar, onClose, customerId }) {
       await addAnbarHereket(customerId, {
         tip,
         mehsul: secilmisMehsul,
+        vahid: secilmisVahid,
         miqdar: Number(miqdar),
-        qiymetKq: tip === 'giris' ? Number(qiymetKq) || 0 : null,
+        qiymetVahid: tip === 'giris' ? Number(qiymetVahid) || 0 : null,
         cemi: tip === 'giris' ? cemi : null,
         tarix,
         qeyd: qeyd.trim() || null,
@@ -79,28 +94,38 @@ function HereketForm({ tip, mehsullar, onClose, customerId }) {
             >
               <option value="">Seçin</option>
               {mehsullar.map((m) => (
-                <option key={m} value={m}>{m}</option>
+                <option key={m.ad} value={m.ad}>{m.ad} ({m.vahid})</option>
               ))}
               <option value="__custom__">Digər (özün yaz)...</option>
             </select>
-            {mehsul === '__custom__' && (
-              <input
-                autoFocus
-                value={customMehsul}
-                onChange={(e) => setCustomMehsul(e.target.value)}
-                placeholder="Məhsulun adı"
-                className="w-full mt-2 rounded-lg bg-white/5 border border-white/10 px-3 py-2 text-white outline-none focus:border-indigo-400"
-              />
+            {isCustom && (
+              <div className="flex gap-2 mt-2">
+                <input
+                  autoFocus
+                  value={customMehsul}
+                  onChange={(e) => setCustomMehsul(e.target.value)}
+                  placeholder="Məhsulun adı"
+                  className="flex-1 rounded-lg bg-white/5 border border-white/10 px-3 py-2 text-white outline-none focus:border-indigo-400"
+                />
+                <select
+                  value={customVahid}
+                  onChange={(e) => setCustomVahid(e.target.value)}
+                  className="rounded-lg bg-white/5 border border-white/10 px-3 py-2 text-white outline-none focus:border-indigo-400"
+                >
+                  <option value="kq">kq</option>
+                  <option value="ədəd">ədəd</option>
+                </select>
+              </div>
             )}
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-sm text-gray-300 mb-1">Miqdar (kq)</label>
+              <label className="block text-sm text-gray-300 mb-1">Miqdar ({secilmisVahid})</label>
               <input
                 type="number"
                 min={0}
-                step="0.1"
+                step={secilmisVahid === 'ədəd' ? '1' : '0.1'}
                 value={miqdar}
                 onChange={(e) => setMiqdar(e.target.value)}
                 className="w-full rounded-lg bg-white/5 border border-white/10 px-3 py-2 text-white outline-none focus:border-indigo-400"
@@ -119,13 +144,13 @@ function HereketForm({ tip, mehsullar, onClose, customerId }) {
 
           {tip === 'giris' && (
             <div>
-              <label className="block text-sm text-gray-300 mb-1">Qiymət (1 kq, ₼)</label>
+              <label className="block text-sm text-gray-300 mb-1">Qiymət (1 {secilmisVahid}, ₼)</label>
               <input
                 type="number"
                 min={0}
                 step="0.01"
-                value={qiymetKq}
-                onChange={(e) => setQiymetKq(e.target.value)}
+                value={qiymetVahid}
+                onChange={(e) => setQiymetVahid(e.target.value)}
                 className="w-full rounded-lg bg-white/5 border border-white/10 px-3 py-2 text-white outline-none focus:border-indigo-400"
               />
               {cemi !== null && cemi > 0 && (
@@ -174,9 +199,11 @@ export default function Anbar() {
   }, [customerId]);
 
   const mehsulList = useMemo(() => {
-    const names = new Set(PRESET_MEHSULLAR);
-    hereketler.forEach((h) => names.add(h.mehsul));
-    return [...names];
+    const map = new Map(PRESET_MEHSULLAR.map((m) => [m.ad, m.vahid]));
+    hereketler.forEach((h) => {
+      if (!map.has(h.mehsul)) map.set(h.mehsul, h.vahid || 'kq');
+    });
+    return [...map.entries()].map(([ad, vahid]) => ({ ad, vahid }));
   }, [hereketler]);
 
   const qaliqlar = useMemo(() => {
@@ -186,8 +213,8 @@ export default function Anbar() {
       map[h.mehsul] += h.tip === 'giris' ? h.miqdar : -h.miqdar;
     }
     return mehsulList
-      .map((m) => ({ mehsul: m, qaliq: map[m] || 0 }))
-      .filter((x) => x.qaliq !== 0 || PRESET_MEHSULLAR.includes(x.mehsul))
+      .map((m) => ({ ...m, qaliq: map[m.ad] || 0 }))
+      .filter((x) => x.qaliq !== 0 || PRESET_MEHSULLAR.some((p) => p.ad === x.ad))
       .sort((a, b) => b.qaliq - a.qaliq);
   }, [hereketler, mehsulList]);
 
@@ -227,11 +254,11 @@ export default function Anbar() {
         <div className="rounded-2xl border border-white/10 bg-white/5 p-4 sm:p-5">
           <p className="text-white font-medium mb-3">Cari qalıqlar</p>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-            {qaliqlar.map(({ mehsul, qaliq }) => (
-              <div key={mehsul} className="rounded-lg border border-white/10 bg-white/5 px-3 py-2.5">
-                <p className="text-sm text-white truncate">{mehsul}</p>
+            {qaliqlar.map(({ ad, vahid, qaliq }) => (
+              <div key={ad} className="rounded-lg border border-white/10 bg-white/5 px-3 py-2.5">
+                <p className="text-sm text-white truncate">{ad}</p>
                 <p className={`text-lg font-semibold ${qaliq < 0 ? 'text-red-400' : qaliq === 0 ? 'text-gray-500' : 'text-emerald-400'}`}>
-                  {qaliq.toLocaleString('az-AZ')} kq
+                  {qaliq.toLocaleString('az-AZ')} {vahid}
                 </p>
               </div>
             ))}
@@ -260,8 +287,8 @@ export default function Anbar() {
                   <div className="min-w-0">
                     <p className="text-white text-sm truncate">{h.mehsul}</p>
                     <p className="text-xs text-gray-500 truncate">
-                      {h.tarix} · {h.miqdar} kq
-                      {h.tip === 'giris' && h.qiymetKq ? ` · ${h.qiymetKq} ₼/kq` : ''}
+                      {h.tarix} · {h.miqdar} {h.vahid || 'kq'}
+                      {h.tip === 'giris' && h.qiymetVahid ? ` · ${h.qiymetVahid} ₼/${h.vahid || 'kq'}` : ''}
                       {h.qeyd ? ` · ${h.qeyd}` : ''}
                     </p>
                   </div>
