@@ -15,7 +15,12 @@ const PRESET_MEHSULLAR = [
   { ad: 'Soğan', vahid: 'kq' },
   { ad: 'Yaşıl göyərti', vahid: 'kq' },
   { ad: 'Su (0.5L)', vahid: 'ədəd' },
+  { ad: 'Su (1L)', vahid: 'ədəd' },
   { ad: 'Su (1.5L)', vahid: 'ədəd' },
+  { ad: 'Araq (0.5L)', vahid: 'ədəd' },
+  { ad: 'Araq (0.75L)', vahid: 'ədəd' },
+  { ad: 'Çaxır', vahid: 'ədəd' },
+  { ad: 'Kompot', vahid: 'ədəd' },
   { ad: 'Sərinləşdirici içki', vahid: 'ədəd' },
   { ad: 'Çörək', vahid: 'ədəd' },
 ];
