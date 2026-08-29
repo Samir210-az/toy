@@ -46,20 +46,6 @@ export default function Dashboard() {
       <Header onAddClick={() => setModalOpen(true)} />
 
       <main className="max-w-6xl mx-auto px-4 py-6 space-y-6">
-        <div className="relative rounded-2xl border border-white/10 bg-gradient-to-br from-white/5 to-white/0 overflow-hidden">
-          <div className="flex items-center justify-between px-5 py-4">
-            <div>
-              <p className="text-white font-semibold text-lg">{customer.restoranAdi}</p>
-              <p className="text-sm text-gray-400">Toy və məclislərinizi buradan idarə edin</p>
-            </div>
-            <img
-              src="/images/home-couple.png"
-              alt=""
-              className="h-24 w-auto object-contain shrink-0 -my-2"
-            />
-          </div>
-        </div>
-
         {access.reason === 'trial' && (
           <div className="rounded-xl border border-amber-500/20 bg-amber-500/10 px-4 py-2.5 text-sm text-amber-300">
             Pulsuz sınaq müddətindəsiniz —{' '}
@@ -71,7 +57,7 @@ export default function Dashboard() {
 
         <EmptyDaysCard meclisler={meclisler} />
 
-        <Calendar zallar={zallar} meclisler={meclisler} />
+        <Calendar zallar={zallar} meclisler={meclisler} bgImage="/images/home-couple.png" />
       </main>
 
       <Footer />

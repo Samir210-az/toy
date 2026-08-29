@@ -3,7 +3,7 @@ import { formatDateKey, getMonthDays, getMonthLabel, isToday, AZ_GUNLER } from '
 import { getZalColor } from '../utils/colors';
 import MeclisDetailModal from './MeclisDetailModal';
 
-export default function Calendar({ zallar, meclisler }) {
+export default function Calendar({ zallar, meclisler, bgImage }) {
   const [cursor, setCursor] = useState(new Date());
   const [selectedKey, setSelectedKey] = useState(null);
   const [detailMeclis, setDetailMeclis] = useState(null);
@@ -24,7 +24,16 @@ export default function Calendar({ zallar, meclisler }) {
   const zalAdi = (zalId) => zallar.find((z) => z.id === zalId)?.ad || 'Silinmiş zal';
 
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/5 p-4 sm:p-5">
+    <div className="relative rounded-2xl border border-white/10 bg-white/5 p-4 sm:p-5 overflow-hidden">
+      {bgImage && (
+        <img
+          src={bgImage}
+          alt=""
+          className="pointer-events-none select-none absolute -right-6 -bottom-4 h-[115%] w-auto object-contain opacity-[0.14] mix-blend-screen"
+        />
+      )}
+
+      <div className="relative z-10">
       <div className="flex items-center justify-between mb-4">
         <button
           onClick={() => setCursor(new Date(year, month - 1, 1))}
@@ -115,6 +124,7 @@ export default function Calendar({ zallar, meclisler }) {
           onClose={() => setDetailMeclis(null)}
         />
       )}
+      </div>
     </div>
   );
 }

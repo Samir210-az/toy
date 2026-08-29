@@ -1,8 +1,8 @@
 export const HALL_IMAGES = [
-  '/images/hall-1.webp',
-  '/images/hall-2.jpg',
+  '/images/hall-1.png',
+  '/images/hall-2.png',
   '/images/hall-3.png',
-  '/images/hall-4.jpg',
+  '/images/hall-4.png',
 ];
 
 export function getHallImage(zalId, zallar) {

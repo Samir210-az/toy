@@ -22,13 +22,14 @@ export default function HallGrid({ zallar, meclisler }) {
           <Link
             key={zal.id}
             to={`/zal/${zal.id}`}
-            className={`relative rounded-xl border ${color.border} overflow-hidden hover:brightness-110 transition-all`}
+            className={`relative rounded-xl border ${color.border} ${color.soft} overflow-hidden hover:brightness-110 transition-all p-4`}
           >
-            <div className="h-24 w-full overflow-hidden bg-white/5">
-              <img src={image} alt="" className="w-full h-full object-cover" />
-              <div className={`absolute inset-0 bg-gradient-to-t ${color.gradient} via-black/40 to-black/10`} />
-            </div>
-            <div className="p-3">
+            <img
+              src={image}
+              alt=""
+              className="pointer-events-none select-none absolute -right-3 -bottom-3 h-[135%] w-auto object-contain opacity-20 mix-blend-screen"
+            />
+            <div className="relative z-10">
               <div className="flex items-center gap-2 mb-1">
                 <span className={`w-2.5 h-2.5 rounded-full ${color.dot}`} />
                 <p className="text-white font-medium truncate">{zal.ad}</p>

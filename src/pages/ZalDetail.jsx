@@ -57,13 +57,12 @@ export default function ZalDetail() {
         </div>
       </header>
 
-      <div className="relative h-32 sm:h-40 overflow-hidden">
-        <img src={getHallImage(zalId, zallar)} alt="" className="w-full h-full object-cover" />
-        <div className={`absolute inset-0 bg-gradient-to-t ${color.gradient} via-black/50 to-[#0f1115]`} />
-      </div>
-
-      <main className="max-w-6xl mx-auto px-4 py-6 space-y-6 -mt-8 relative">
-        <Calendar zallar={zallar.filter((z) => z.id === zalId)} meclisler={zalMeclisler} />
+      <main className="max-w-6xl mx-auto px-4 py-6 space-y-6">
+        <Calendar
+          zallar={zallar.filter((z) => z.id === zalId)}
+          meclisler={zalMeclisler}
+          bgImage={getHallImage(zalId, zallar)}
+        />
 
         <div className="rounded-2xl border border-white/10 bg-white/5 p-4 sm:p-5">
           <p className="text-white font-medium mb-3">Gələcək məclislər ({gelecekMeclisler.length})</p>
