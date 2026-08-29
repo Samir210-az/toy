@@ -11,7 +11,7 @@ const AZ_AYLAR = [
   'İyul', 'Avqust', 'Sentyabr', 'Oktyabr', 'Noyabr', 'Dekabr',
 ];
 
-export default function RevenueCard({ zallar, meclisler }) {
+export default function RevenueCard({ zallar, meclisler, anbarHereketleri = [], kadrOdenisleri = [] }) {
   const stats = useMemo(() => {
     const monthKey = currentMonthKey();
     let monthTotal = 0;
@@ -33,8 +33,15 @@ export default function RevenueCard({ zallar, meclisler }) {
       .map((z) => ({ zal: z, total: perHall[z.id] || 0 }))
       .sort((a, b) => b.total - a.total);
 
-    return { monthTotal, monthCount, allTimeTotal, perHallList };
-  }, [zallar, meclisler]);
+    const anbarXerci = anbarHereketleri
+      .filter((h) => h.tip === 'giris')
+      .reduce((s, h) => s + (Number(h.cemi) || 0), 0);
+    const kadrXerci = kadrOdenisleri.reduce((s, o) => s + (Number(o.meblegh) || 0), 0);
+    const umumiXerc = anbarXerci + kadrXerci;
+    const xalisGelir = allTimeTotal - umumiXerc;
+
+    return { monthTotal, monthCount, allTimeTotal, perHallList, anbarXerci, kadrXerci, umumiXerc, xalisGelir };
+  }, [zallar, meclisler, anbarHereketleri, kadrOdenisleri]);
 
   const monthLabel = AZ_AYLAR[new Date().getMonth()];
 
@@ -61,7 +68,7 @@ export default function RevenueCard({ zallar, meclisler }) {
       </div>
 
       {stats.perHallList.length > 0 && (
-        <div className="border-t border-white/10 pt-3 space-y-2">
+        <div className="border-t border-white/10 pt-3 space-y-2 mb-4">
           {stats.perHallList.map(({ zal, total }) => {
             const color = getZalColor(zal.id, zallar);
             const pct = stats.allTimeTotal > 0 ? Math.round((total / stats.allTimeTotal) * 100) : 0;
@@ -76,6 +83,25 @@ export default function RevenueCard({ zallar, meclisler }) {
               </div>
             );
           })}
+        </div>
+      )}
+
+      {stats.umumiXerc > 0 && (
+        <div className="border-t border-white/10 pt-3 space-y-1.5">
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-gray-400">Anbar xərci</span>
+            <span className="text-orange-400">− {stats.anbarXerci.toLocaleString('az-AZ')} ₼</span>
+          </div>
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-gray-400">Kadr xərci</span>
+            <span className="text-orange-400">− {stats.kadrXerci.toLocaleString('az-AZ')} ₼</span>
+          </div>
+          <div className="flex items-center justify-between pt-1.5 border-t border-white/10">
+            <span className="text-white font-medium">Xalis gəlir</span>
+            <span className={`text-lg font-semibold ${stats.xalisGelir >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+              {stats.xalisGelir.toLocaleString('az-AZ')} ₼
+            </span>
+          </div>
         </div>
       )}
     </div>

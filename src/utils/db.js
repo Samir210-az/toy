@@ -159,6 +159,29 @@ export async function deleteAnbarHereket(customerId, hereketId) {
   await remove(ref(db, `customers/${customerId}/anbarHereketleri/${hereketId}`));
 }
 
+// ---------- Kadr ödənişləri ----------
+
+export function subscribeKadrOdenisleri(customerId, callback) {
+  return onValue(ref(db, `customers/${customerId}/kadrOdenisleri`), (snap) => {
+    const val = snap.val() || {};
+    callback(
+      Object.entries(val)
+        .map(([id, k]) => ({ id, ...k }))
+        .sort((a, b) => (b.tarix || '').localeCompare(a.tarix || '') || b.createdAt - a.createdAt)
+    );
+  });
+}
+
+export async function addKadrOdenis(customerId, odenis) {
+  const kRef = push(ref(db, `customers/${customerId}/kadrOdenisleri`));
+  await set(kRef, { ...odenis, createdAt: Date.now() });
+  return kRef.key;
+}
+
+export async function deleteKadrOdenis(customerId, odenisId) {
+  await remove(ref(db, `customers/${customerId}/kadrOdenisleri/${odenisId}`));
+}
+
 // ---------- Admin ----------
 
 export function subscribeAllCustomers(callback) {

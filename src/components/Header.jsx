@@ -19,6 +19,12 @@ export default function Header({ onAddClick }) {
           >
             📦 Anbar
           </Link>
+          <Link
+            to="/kadr"
+            className="rounded-lg border border-white/10 hover:bg-white/5 transition-colors px-3 py-2 text-sm text-gray-300"
+          >
+            👥 Kadr
+          </Link>
           <button
             onClick={onAddClick}
             className="rounded-lg bg-indigo-500 hover:bg-indigo-400 transition-colors px-4 py-2 text-sm font-medium text-white"

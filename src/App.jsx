@@ -6,6 +6,7 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import ZalDetail from './pages/ZalDetail';
 import Anbar from './pages/Anbar';
+import Kadr from './pages/Kadr';
 import AdminPanel from './pages/AdminPanel';
 
 export default function App() {
@@ -37,6 +38,14 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <Anbar />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/kadr"
+            element={
+              <ProtectedRoute>
+                <Kadr />
               </ProtectedRoute>
             }
           />
