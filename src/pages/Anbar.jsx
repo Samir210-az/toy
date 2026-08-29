@@ -391,8 +391,6 @@ export default function Anbar() {
       </header>
 
       <main className="max-w-6xl mx-auto px-4 py-6 space-y-6">
-        {role !== 'anbarci' && <AnbarciPinPanel customerId={customerId} mevcudPin={customer?.anbarPin} />}
-
         <div className="rounded-2xl border border-white/10 bg-white/5 p-4 sm:p-5">
           <p className="text-white font-medium mb-3">Cari qalıqlar</p>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
@@ -469,6 +467,12 @@ export default function Anbar() {
           </div>
         </div>
       </main>
+
+      {role !== 'anbarci' && (
+        <div className="max-w-6xl mx-auto px-4 pb-6">
+          <AnbarciPinPanel customerId={customerId} mevcudPin={customer?.anbarPin} />
+        </div>
+      )}
 
       <Footer />
 
