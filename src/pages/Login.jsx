@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { loginCustomer } from '../utils/db';
 import { useAuth } from '../hooks/useAuth';
@@ -10,6 +10,21 @@ export default function Login() {
   const [pin, setPin] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const tapCount = useRef(0);
+  const tapTimer = useRef(null);
+
+  function handleTitleTap() {
+    tapCount.current += 1;
+    clearTimeout(tapTimer.current);
+    if (tapCount.current >= 5) {
+      tapCount.current = 0;
+      navigate('/admin');
+      return;
+    }
+    tapTimer.current = setTimeout(() => {
+      tapCount.current = 0;
+    }, 1500);
+  }
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -29,7 +44,9 @@ export default function Login() {
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-10 bg-gradient-to-b from-[#0f1115] to-[#161a22]">
       <div className="w-full max-w-md rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl p-8 shadow-2xl">
-        <h1 className="text-2xl font-semibold text-white mb-6">Daxil olun</h1>
+        <h1 onClick={handleTitleTap} className="text-2xl font-semibold text-white mb-6 select-none">
+          Daxil olun
+        </h1>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
