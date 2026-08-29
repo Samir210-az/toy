@@ -69,8 +69,17 @@ export async function loginCustomer(phone, pin) {
   const snap = await get(ref(db, `customers/${customerId}`));
   if (!snap.exists()) throw new Error('Bu nömrə ilə qeydiyyat tapılmadı.');
   const data = snap.val();
-  if (data.pin !== pin) throw new Error('PIN kodu yanlışdır.');
-  return { customerId, ...data };
+  if (data.pin === pin) {
+    return { customerId, role: 'owner', ...data };
+  }
+  if (data.anbarPin && data.anbarPin === pin) {
+    return { customerId, role: 'anbarci', ...data };
+  }
+  throw new Error('PIN kodu yanlışdır.');
+}
+
+export async function setAnbarPin(customerId, anbarPin) {
+  await update(ref(db, `customers/${customerId}`), { anbarPin: anbarPin || null });
 }
 
 export function getAccessState(customer) {

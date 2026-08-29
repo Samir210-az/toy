@@ -31,9 +31,9 @@ export default function Login() {
     setError('');
     setLoading(true);
     try {
-      const { customerId } = await loginCustomer(phone, pin);
-      login(customerId);
-      navigate('/');
+      const { customerId, role } = await loginCustomer(phone, pin);
+      login(customerId, role);
+      navigate(role === 'anbarci' ? '/anbar' : '/');
     } catch (err) {
       setError(err.message);
     } finally {

@@ -1,7 +1,14 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import { subscribeAnbarHereketleri, addAnbarHereket, deleteAnbarHereket, subscribeMeclisler, subscribeZallar } from '../utils/db';
+import {
+  subscribeAnbarHereketleri,
+  addAnbarHereket,
+  deleteAnbarHereket,
+  subscribeMeclisler,
+  subscribeZallar,
+  setAnbarPin,
+} from '../utils/db';
 import Footer from '../components/Footer';
 
 const PRESET_MEHSULLAR = [
@@ -228,8 +235,82 @@ function HereketForm({ tip, mehsullar, meclisler, zallar, onClose, customerId })
   );
 }
 
+function AnbarciPinPanel({ customerId, mevcudPin }) {
+  const [editing, setEditing] = useState(false);
+  const [pin, setPin] = useState('');
+  const [saving, setSaving] = useState(false);
+
+  async function handleSave() {
+    if (pin.length < 4) return;
+    setSaving(true);
+    await setAnbarPin(customerId, pin);
+    setSaving(false);
+    setEditing(false);
+    setPin('');
+  }
+
+  async function handleRemove() {
+    setSaving(true);
+    await setAnbarPin(customerId, null);
+    setSaving(false);
+  }
+
+  return (
+    <div className="rounded-2xl border border-white/10 bg-white/5 p-4 sm:p-5">
+      <p className="text-white font-medium mb-1">Anbarçı girişi</p>
+      <p className="text-xs text-gray-500 mb-3">
+        Bu PIN-i anbar işçisinə ver — telefon nömrənlə + bu PIN-lə daxil olanda yalnız Anbar səhifəsini görəcək,
+        başqa heç nəyə girişi olmayacaq.
+      </p>
+
+      {mevcudPin && !editing && (
+        <div className="flex items-center justify-between rounded-lg bg-white/5 border border-white/10 px-3 py-2 mb-2">
+          <span className="text-sm text-gray-300">Aktiv PIN: <span className="text-white font-mono">{mevcudPin}</span></span>
+          <button onClick={handleRemove} disabled={saving} className="text-xs text-red-400 hover:text-red-300">
+            Ləğv et
+          </button>
+        </div>
+      )}
+
+      {editing ? (
+        <div className="flex gap-2">
+          <input
+            autoFocus
+            inputMode="numeric"
+            value={pin}
+            onChange={(e) => setPin(e.target.value.replace(/\D/g, ''))}
+            placeholder="Yeni PIN (min. 4 rəqəm)"
+            maxLength={8}
+            className="flex-1 rounded-lg bg-white/5 border border-white/10 px-3 py-2 text-sm text-white outline-none focus:border-indigo-400"
+          />
+          <button
+            onClick={handleSave}
+            disabled={saving || pin.length < 4}
+            className="rounded-lg bg-indigo-500 hover:bg-indigo-400 px-3 py-2 text-sm text-white disabled:opacity-50"
+          >
+            Yadda saxla
+          </button>
+          <button
+            onClick={() => { setEditing(false); setPin(''); }}
+            className="rounded-lg border border-white/10 px-3 py-2 text-sm text-gray-400"
+          >
+            Ləğv
+          </button>
+        </div>
+      ) : (
+        <button
+          onClick={() => setEditing(true)}
+          className="text-sm text-indigo-400 hover:text-indigo-300"
+        >
+          {mevcudPin ? 'PIN-i dəyiş' : '+ Anbarçı PIN təyin et'}
+        </button>
+      )}
+    </div>
+  );
+}
+
 export default function Anbar() {
-  const { customerId } = useAuth();
+  const { customerId, customer, role, logout } = useAuth();
   const [hereketler, setHereketler] = useState([]);
   const [meclisler, setMeclisler] = useState([]);
   const [zallar, setZallar] = useState([]);
@@ -277,9 +358,11 @@ export default function Anbar() {
       <header className="sticky top-0 z-30 border-b border-white/10 bg-[#0f1115]/90 backdrop-blur-xl">
         <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <Link to="/" className="text-gray-400 hover:text-white text-xl leading-none">
-              ‹
-            </Link>
+            {role !== 'anbarci' && (
+              <Link to="/" className="text-gray-400 hover:text-white text-xl leading-none">
+                ‹
+              </Link>
+            )}
             <h1 className="text-white font-semibold">Anbar</h1>
           </div>
           <div className="flex items-center gap-2">
@@ -295,11 +378,21 @@ export default function Anbar() {
             >
               − Çıxış
             </button>
+            {role === 'anbarci' && (
+              <button
+                onClick={logout}
+                className="rounded-lg border border-white/10 hover:bg-white/5 transition-colors px-3 py-2 text-sm text-gray-400"
+              >
+                Hesabdan çıx
+              </button>
+            )}
           </div>
         </div>
       </header>
 
       <main className="max-w-6xl mx-auto px-4 py-6 space-y-6">
+        {role !== 'anbarci' && <AnbarciPinPanel customerId={customerId} mevcudPin={customer?.anbarPin} />}
+
         <div className="rounded-2xl border border-white/10 bg-white/5 p-4 sm:p-5">
           <p className="text-white font-medium mb-3">Cari qalıqlar</p>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
